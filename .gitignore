@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.hypothesis/
+.venv/
+venv/
+.coverage
+htmlcov/
+
+# Agent artifacts (never commit)
+.superpowers/
+.claude/
+CLAUDE.md
+**/settings.local.json
+**/scheduled_tasks.lock
+.apache-steward/
+docs/superpowers/
