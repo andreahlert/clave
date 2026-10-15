@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Id": "clave-enclave-only-decrypt",
+  "Statement": [
+    {
+      "Sid": "AdminsManageKey",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::ACCOUNT_ID:root" },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "OnlyThisEnclaveMayDecrypt",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::ACCOUNT_ID:role/clave-parent-role" },
+      "Action": "kms:Decrypt",
+      "Resource": "*",
+      "Condition": {
+        "StringEqualsIgnoreCase": {
+          "kms:RecipientAttestation:PCR0": "REPLACE_WITH_PCR0_FROM_BUILD"
+        }
+      }
+    }
+  ]
+}

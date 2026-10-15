@@ -20,3 +20,11 @@ CLAUDE.md
 **/scheduled_tasks.lock
 .apache-steward/
 docs/superpowers/
+
+# Nitro build artifacts
+nitro/enclave/clave/
+nitro/enclave/kmstool_enclave_cli
+nitro/enclave/libnsm.so
+nitro/*.eif
+nitro/*.enc.b64
+key.bin

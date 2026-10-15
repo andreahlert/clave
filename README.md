@@ -18,6 +18,15 @@ zero dependencies, fully tested.
 
 ---
 
+> **Read this first.** The pure-Python code in `src/` is a *reference
+> implementation of the pattern*, not a shield. In Python the key sits in
+> process memory and a debugger can read it, so by itself it protects nothing.
+> Real protection comes only from running the core inside a hardware TEE. A
+> complete, deploy-ready AWS Nitro Enclaves backend lives in [`nitro/`](nitro/),
+> where the key is released by AWS KMS only to an attested enclave. This repo
+> also does not make anything "immune" to reverse engineering; nothing does. It
+> raises the cost under a specific threat model. See [Honest limits](#honest-limits).
+
 ## Why this exists
 
 Code that runs entirely on hardware the vendor does not control can be studied
@@ -117,6 +126,27 @@ with your logic and run it inside an actual TEE.
 | **Server / B2B** | [AWS Nitro Enclaves](https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html), [Azure Confidential Computing](https://learn.microsoft.com/en-us/azure/confidential-computing/overview), [Google Confidential Space](https://cloud.google.com/confidential-computing/confidential-space/docs/confidential-space-overview) |
 | **Desktop** | [Open Enclave SDK](https://github.com/openenclave/openenclave), [Apache Teaclave](https://github.com/apache/incubator-teaclave-sgx-sdk) |
 | **Mobile** | [Apple Secure Enclave](https://developer.apple.com/documentation/cryptokit/secureenclave), [Android StrongBox](https://developer.android.com/privacy-and-security/keystore) |
+
+A working **AWS Nitro Enclaves** backend ships in [`nitro/`](nitro/): vsock
+server, KMS-gated key release bound to the enclave's attestation PCRs, build
+and run scripts, and a key-provisioning helper. Its protocol dispatch is tested
+off-hardware; the vsock and KMS paths run on a Nitro EC2 instance.
+
+## Will a developer using this be free from reverse engineering?
+
+No, and neither does any other technique make code immune. What `clave`
+provides, on real hardware, is protection that holds **only when all of these
+are true**:
+
+1. The core is genuinely keyed, so its output is unlearnable from samples.
+   (If the behavior can be learned from input/output pairs, no TEE helps.)
+2. The value lives in the core, not in the input/output visible at the edge.
+3. The query budget is tight, so pairs cannot be harvested in bulk.
+4. The input space is large enough that it cannot simply be enumerated.
+
+Even then it raises cost rather than granting immunity, and it does not stop a
+side-channel-capable, state-level effort. Pair it with legal protection and
+watermarking.
 
 ## Honest limits
 
